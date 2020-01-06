@@ -10,13 +10,46 @@ MODULE_AUTHOR("Andrii Koval <andykoval@ucu.edu.ua>");
 MODULE_DESCRIPTION("A simple Linux driver for 7-segment LED display.");
 MODULE_VERSION("0.1");
 
-//        4 
-//     #=====#
-//  17 |  25 | 13
-//     #=====#
-//  6  |     | 22
-//     #=====#
-//        26
+static unsigned int gpio_pins[] = {4, 13, 22, 26, 6, 17, 25};
+
+static unsigned int current_number = 0;
+
+int display_number(unsigned char num) {
+
+    //        4 
+    //     #=====#
+    //  17 |  25 | 13
+    //     #=====#
+    //  6  |     | 22
+    //     #=====#
+    //        26
+
+    const unsigned int numbers[] = {
+        0b0111111,
+        0b0000110,
+        0b1011011,
+        0b1001111,
+        0b1100110,
+        0b1101101,
+        0b1111101,
+        0b0000111,
+        0b1111111,
+        0b1101111,
+    };
+
+    if (num > 9) {
+        printk(KERN_ERR "Invalid input number. Try in range [0-9]\n");
+        return 1;
+    }
+
+    int i = 0;
+    for (; i < 7; ++i) {
+        toggle_pin(gpio_pins[i], (numbers[num] >> i) & 1);
+    }
+
+    current_number = num;
+    return 0;
+}
 
 static ssize_t number_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf) {
     return sprintf(buf, "Current number: %u\n", (unsigned char) current_number);
@@ -38,7 +71,7 @@ static struct attribute *led_display_attributes[] = {
 };
 
 static struct attribute_group attr_group = {
-    .name = "7-segment led display",
+    .name = "led_display",
     .attrs = led_display_attributes
 };
 

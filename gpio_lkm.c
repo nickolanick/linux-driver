@@ -503,32 +503,11 @@ static void __exit gpio_lkm_exit(void)
     printk(KERN_INFO "[GPIO_LKM] - Raspberry Pi GPIO driver removed\n");
 }
 
-extern int display_number(unsigned char num) {
-    static unsigned int numbers[] = {
-        0b1111110,
-        0b0110000,
-        0b1101101,
-        0b1111001,
-        0b0110011,
-        0b1011011,
-        0b1011111,
-        0b1110000,
-        0b1111111,
-        0b1111011,
-    };
-
-    if (num > 9) {
-        printk(KERN_ERR "Invalid input number. Try in range [0-9]\n");
-        return 1;
-    }
-    int i;
-    for (i = 0; i < 8; ++i) {
-        gpio_set_value(gpio_pins[i], (numbers[num] >> i) & 1);
-    }
-    current_number = num;
+extern int toggle_pin(int gpio, unsigned int cmd) {
+    gpio_set_value(gpio, cmd);
 }
 
-EXPORT_SYMBOL(display_number);
+EXPORT_SYMBOL(toggle_pin);
 
 /* these are stantard macros to mark
  * init and exit functions implemetations

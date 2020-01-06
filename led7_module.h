@@ -1,4 +1,2 @@
-static unsigned int current_number = 0;
-static unsigned int gpio_pins[] = {4, 13, 22, 26, 6, 17, 25};
-
+extern int toggle_pin(int gpio, unsigned int cmd);
 int display_number(unsigned char);
